@@ -1,0 +1,23 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Lab run outputs (regenerate with lab/run_full_evaluation.sh)
+lab/results/*
+!lab/results/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# Duplicate figure copies live at repo root from earlier drafts; the
+# canonical, site-referenced copies are under docs/assets/figures/.
+/fig*.png

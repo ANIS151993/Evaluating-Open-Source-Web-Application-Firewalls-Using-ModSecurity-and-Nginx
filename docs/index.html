@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open-Source WAF Evaluation | ModSecurity + Nginx + OWASP CRS</title>
+<meta name="description" content="A reproducible performance and security evaluation of an open-source Web Application Firewall built on ModSecurity v3, Nginx, and the OWASP Core Rule Set.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <div class="brand">WAF<span>::</span>Research</div>
+    <div class="navlinks">
+      <a href="#abstract">Abstract</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#results">Results</a>
+      <a href="#lab">Live Lab</a>
+      <a href="#downloads">Downloads</a>
+      <a href="#author">Author</a>
+    </div>
+    <button id="theme-toggle" class="theme-toggle">🌙 Dark</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="badges">
+      <span class="badge accent">IEEE Conference Format</span>
+      <span class="badge">ModSecurity v3</span>
+      <span class="badge">Nginx</span>
+      <span class="badge">OWASP CRS 3.3</span>
+      <span class="badge">MIT Licensed Artifacts</span>
+    </div>
+    <h1 class="title">Open-Source Web Application Firewall Implementation Using ModSecurity Engine</h1>
+    <p class="lede" style="font-size:1.15rem; color:var(--ink-2); margin-bottom:26px;">
+      A Performance and Security Evaluation Framework — a Design-Science-Research
+      study of ModSecurity v3 + Nginx + the OWASP Core Rule Set, with a fully
+      reproducible testbed anyone can run.
+    </p>
+    <p class="authors">
+      <b>Md Anisur Rahman Chowdhury</b><sup>1*</sup> &middot; Samuel Tweneboah-Koduah, Ph.D.<sup>1</sup><br>
+      Dept. of Computer &amp; Information Science, Gannon University &middot; Campbellsville University
+    </p>
+    <div class="cta-row">
+      <a class="btn primary" href="assets/WAF-ModSecurity-Paper.pdf">📄 Read the Paper (PDF)</a>
+      <a class="btn ghost" href="assets/WAF-ModSecurity-Paper-LaTeX.zip">⬇ Download LaTeX Project</a>
+      <a class="btn ghost" href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx">⭐ View on GitHub</a>
+      <a class="btn ghost" href="#lab">🧪 Try the Live Lab</a>
+    </div>
+
+    <div class="stats reveal">
+      <div class="stat"><div class="num" data-target="98.4" data-decimals="1" data-suffix="%">0%</div><div class="lbl">Aggregate attack detection rate</div></div>
+      <div class="stat"><div class="num" data-target="4.3" data-decimals="1" data-suffix="%">0%</div><div class="lbl">False positive rate (tuned)</div></div>
+      <div class="stat"><div class="num" data-target="11.8" data-decimals="1" data-suffix=" ms">0 ms</div><div class="lbl">Average latency overhead</div></div>
+      <div class="stat"><div class="num" data-target="9200" data-suffix="">0</div><div class="lbl">Attack requests evaluated</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="abstract">
+  <div class="wrap">
+    <span class="eyebrow reveal">Abstract</span>
+    <h2 class="reveal">Enterprise-grade Layer-7 security, zero licensing cost</h2>
+    <div class="grid-2" style="margin-top:28px;">
+      <div class="reveal">
+        <p class="lede" style="max-width:none;">
+          Web applications remain primary targets for cyberattacks; roughly half of
+          confirmed security breaches exploit application-layer vulnerabilities that
+          traditional Layer 3–4 firewalls simply cannot see. This work presents a
+          comprehensive methodology for evaluating an open-source Web Application
+          Firewall built on Nginx + ModSecurity v3 + OWASP Core Rule Set v3.3.
+        </p>
+        <p class="lede" style="max-width:none;">
+          Deployed on Ubuntu 22.04 and driven through 50,000 legitimate requests and
+          9,200 attack vectors at up to 5,000 requests/second, the tuned configuration
+          achieved a <b>98.4%</b> detection rate on signature-based attacks and
+          <b>92.7%</b> on zero-day variants, with a false-positive rate reduced from
+          12.4% to <b>4.3%</b> through a systematic four-stage tuning workflow — all
+          at an average latency overhead of just <b>11.8 ms</b>.
+        </p>
+        <div class="pill-list" style="margin-top:18px;">
+          <span class="badge">PCI DSS 6.6 compliant</span>
+          <span class="badge">Design Science Research methodology</span>
+          <span class="badge">Fully reproducible artifacts</span>
+        </div>
+      </div>
+      <div class="card reveal">
+        <div class="icon-chip">🎯</div>
+        <h3>Research Objectives</h3>
+        <p>Build a production-suitable open-source WAF; measure OWASP Top-10 detection;
+        analyze performance under realistic load; systematically cut false positives below
+        5%; publish a reproducible deployment blueprint.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="architecture" class="alt">
+  <div class="wrap">
+    <span class="eyebrow reveal">System Design</span>
+    <h2 class="reveal">Request flow &amp; the tuning workflow</h2>
+    <p class="lede reveal">Every request is inspected at Layer 7 before it ever reaches the
+    application — and every blocking decision is driven by a repeatable, four-stage
+    tuning cycle rather than guesswork.</p>
+
+    <div class="grid-2" style="margin-top:32px;">
+      <figure class="fig-frame reveal">
+        <img src="assets/figures/fig2_modsec_pipeline.png" alt="ModSecurity five-phase processing pipeline">
+        <figcaption>Fig. — ModSecurity's five-phase request/response processing pipeline.</figcaption>
+      </figure>
+      <figure class="fig-frame reveal">
+        <img src="assets/figures/fig6_tuning_workflow.png" alt="Four-phase tuning workflow">
+        <figcaption>Fig. — Detect → Analyze → Exclude → Enforce tuning workflow (Section III-E).</figcaption>
+      </figure>
+    </div>
+
+    <div class="grid-3" style="margin-top:40px;">
+      <div class="card reveal">
+        <div class="icon-chip">🧬</div>
+        <h3>WAF Detection Taxonomy</h3>
+        <p>Signature-based, positive-security, anomaly detection, and hybrid models — CRS
+        combines all four into a single anomaly score.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon-chip">🔬</div>
+        <h3>Design Science Research</h3>
+        <p>Three refinement cycles of build → demonstrate → evaluate, converging on
+        TPR ≥ 95%, FPR ≤ 5%, latency ≤ 15 ms.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon-chip">📊</div>
+        <h3>OWASP CRS Anomaly Scoring</h3>
+        <p>Multiple weak rule matches accumulate into one score; blocking triggers only
+        once the cumulative threshold is crossed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <span class="eyebrow reveal">Results, Visualized</span>
+    <h2 class="reveal">Six views into the data</h2>
+    <p class="lede reveal">Charts tagged <span class="provenance paper" style="margin:0 4px;">paper</span>
+    reproduce the study's own published tables verbatim. Charts tagged
+    <span class="provenance lab" style="margin:0 4px;">live lab</span> were measured by
+    actually running this repository's own Docker lab in the session that built this
+    site — a second, independent data point, not a replay of the original dataset.</p>
+
+    <div class="chart-tabs reveal">
+      <button class="chart-tab active" data-chart="c-pie">Attack Mix (Pie)</button>
+      <button class="chart-tab" data-chart="c-heatmap">Rule Hits (Heatmap)</button>
+      <button class="chart-tab" data-chart="c-violin">Latency Spread (Violin)</button>
+      <button class="chart-tab" data-chart="c-dist">Latency Density (Dist)</button>
+      <button class="chart-tab" data-chart="c-pair">Scaling (Pair Plot)</button>
+      <button class="chart-tab" data-chart="c-joint">CPU vs RPS (Joint Plot)</button>
+    </div>
+
+    <div class="card reveal">
+      <div id="c-pie" class="chart-panel active">
+        <img src="assets/charts/pie_attack_composition.png" alt="Pie chart of malicious traffic composition">
+        <p class="chart-caption">Composition of the 9,200-request attack corpus by category (Table II).</p>
+        <span class="provenance paper">from the paper</span>
+      </div>
+      <div id="c-heatmap" class="chart-panel">
+        <img src="assets/charts/heatmap_rules_by_category.png" alt="Heatmap of CRS rule hits by attack category">
+        <p class="chart-caption">Which CRS rule IDs fired for which attack category, captured from this repo's own ModSecurity audit log.</p>
+        <span class="provenance lab">live lab benchmark</span>
+      </div>
+      <div id="c-violin" class="chart-panel">
+        <img src="assets/charts/violinplot_latency.png" alt="Violin plot comparing baseline and WAF latency distributions">
+        <p class="chart-caption">Full latency distribution shape (not just median/P99) at two concurrency levels, baseline vs. WAF-enabled.</p>
+        <span class="provenance lab">live lab benchmark</span>
+      </div>
+      <div id="c-dist" class="chart-panel">
+        <img src="assets/charts/distplot_latency.png" alt="Distribution plot of request latency">
+        <p class="chart-caption">Density estimate of per-request latency, baseline vs. WAF-enabled, concurrency = 10.</p>
+        <span class="provenance lab">live lab benchmark</span>
+      </div>
+      <div id="c-pair" class="chart-panel">
+        <img src="assets/charts/pairplot_scaling.png" alt="Pair plot of latency, CPU, and memory scaling">
+        <p class="chart-caption">Pairwise relationships between median/P99 latency, CPU, and memory across load levels (Tables VI–VII).</p>
+        <span class="provenance paper">from the paper</span>
+      </div>
+      <div id="c-joint" class="chart-panel">
+        <img src="assets/charts/jointplot_cpu_scaling.png" alt="Joint plot of CPU utilization vs request rate">
+        <p class="chart-caption">CPU utilization vs. request rate with the paper's linear regression fit (R² = 0.987, Eq. 1 / Fig. 10).</p>
+        <span class="provenance paper">from the paper</span>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:40px;">
+      <div class="reveal">
+        <h3>Detection by attack category</h3>
+        <table class="cmp">
+          <thead><tr><th>Category</th><th>Attempts</th><th>Blocked</th><th>Rate</th></tr></thead>
+          <tbody>
+            <tr><td>SQL Injection</td><td>3,600</td><td>3,564</td><td>99.0%</td></tr>
+            <tr><td>Cross-Site Scripting</td><td>2,400</td><td>2,352</td><td>98.0%</td></tr>
+            <tr><td>Local File Inclusion</td><td>1,200</td><td>1,191</td><td>99.3%</td></tr>
+            <tr><td>Remote Code Execution</td><td>800</td><td>782</td><td>97.8%</td></tr>
+            <tr><td>SSRF</td><td>600</td><td>573</td><td>95.5%</td></tr>
+            <tr><td>Path Traversal</td><td>600</td><td>589</td><td>98.2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="reveal">
+        <h3>Tuning cycle convergence</h3>
+        <table class="cmp">
+          <thead><tr><th>Iteration</th><th>TPR</th><th>FPR</th><th>Latency</th></tr></thead>
+          <tbody>
+            <tr><td>Baseline (PL1, T=5)</td><td>96.2%</td><td>12.4%</td><td>+11.2 ms</td></tr>
+            <tr><td>Cycle 1 (URI excl.)</td><td>96.8%</td><td>8.7%</td><td>+11.5 ms</td></tr>
+            <tr><td>Cycle 2 (T=7)</td><td>97.1%</td><td>6.1%</td><td>+11.6 ms</td></tr>
+            <tr><td>Cycle 3 (Param excl.)</td><td>98.4%</td><td>4.3%</td><td>+11.8 ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="lab" class="alt">
+  <div class="wrap">
+    <span class="eyebrow reveal">Reproduce It Yourself</span>
+    <h2 class="reveal">A real Docker lab, not a slide</h2>
+    <p class="lede reveal">The <code>/lab</code> folder in this repository is a genuine
+    Nginx + ModSecurity v3 + OWASP CRS 3.3 reverse proxy in front of OWASP Juice Shop,
+    plus a WAF-disabled twin for side-by-side comparison — the same architecture
+    described in Section III of the paper. Clone it, run one script, and watch it
+    block real attack payloads on your own machine.</p>
+
+    <div class="grid-2" style="margin-top:28px;">
+      <div class="reveal">
+        <div class="code-block"><span class="cmt"># clone and enter the lab</span>
+git clone https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx.git
+cd Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/lab
+
+<span class="cmt"># bring the stack up, replay attacks + legit traffic, analyze the audit log</span>
+./run_full_evaluation.sh</div>
+        <p class="chart-caption">Full instructions, tuning-cycle reproduction steps, and an
+        honesty note on data provenance are in <a href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/tree/main/lab">lab/README.md</a>.</p>
+      </div>
+      <div class="reveal">
+        <h3 style="margin-top:0;">What one real run looked like</h3>
+        <div class="result-pill"><span class="dot" style="background:var(--blue)"></span>88% of the attack corpus blocked — through the WAF</div>
+        <div class="result-pill"><span class="dot" style="background:var(--red)"></span>0% blocked — same corpus, WAF disabled (baseline)</div>
+        <div class="result-pill"><span class="dot" style="background:var(--aqua)"></span>0% false positives — 500 legitimate requests</div>
+        <div class="result-pill"><span class="dot" style="background:var(--orange)"></span>933 live OWASP CRS rules loaded</div>
+        <p class="lede" style="margin-top:16px;">These numbers come from this repository's
+        curated payload set on ordinary developer hardware — see the lab README for why they
+        differ from the paper's own larger-scale figures, and how to close that gap.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="downloads">
+  <div class="wrap">
+    <span class="eyebrow reveal">Get the Artifacts</span>
+    <h2 class="reveal">Everything is open, everything is reproducible</h2>
+    <div class="grid-3" style="margin-top:28px;">
+      <div class="card reveal">
+        <div class="icon-chip">📄</div>
+        <h3>Paper (PDF)</h3>
+        <p>The full IEEE-format paper, ready to read or cite.</p>
+        <div style="margin-top:14px;"><a class="btn primary" href="assets/WAF-ModSecurity-Paper.pdf">Download PDF</a></div>
+      </div>
+      <div class="card reveal">
+        <div class="icon-chip">🧾</div>
+        <h3>LaTeX Source</h3>
+        <p>The complete, self-contained LaTeX project — clone it, tweak it, recompile it.</p>
+        <div style="margin-top:14px;"><a class="btn ghost" href="assets/WAF-ModSecurity-Paper-LaTeX.zip">Download .zip</a></div>
+      </div>
+      <div class="card reveal">
+        <div class="icon-chip">🧪</div>
+        <h3>Lab &amp; Code</h3>
+        <p>Docker Compose stack, attack/traffic scripts, audit-log analyzer — MIT licensed.</p>
+        <div style="margin-top:14px;"><a class="btn ghost" href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx">Open Repository</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="author" class="alt">
+  <div class="wrap">
+    <span class="eyebrow reveal">About the Author</span>
+    <h2 class="reveal">Md Anisur Rahman Chowdhury</h2>
+    <div class="card author-card reveal" style="margin-top:24px;">
+      <div class="avatar">AC</div>
+      <div>
+        <p class="lede" style="max-width:640px;">Researcher in cybersecurity and open-source
+        Layer-7 defense, Dept. of Computer &amp; Information Science, Gannon University.
+        This project is released as a fully reproducible research artifact under the
+        MIT license.</p>
+        <div class="profile-links">
+          <a href="https://linkedin.com/in/md-anisur-rahman-chowdhury-15862420a">LinkedIn</a>
+          <a href="https://github.com/ANIS151993">GitHub</a>
+          <a href="https://scholar.google.com/citations?user=NQyywPoAAAAJ">Google Scholar</a>
+          <a href="https://marcbd.com">Portfolio</a>
+          <a href="https://researchgate.net/profile/Md-Anisur-Rahman-Chowdhury">ResearchGate</a>
+          <a href="https://youtu.be/MQjXawKSA7M">Video Walkthrough</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>&copy; 2026 Md Anisur Rahman Chowdhury. All rights reserved. Code and lab artifacts released under the MIT License.</div>
+    <div><a href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx">GitHub</a></div>
+  </div>
+</footer>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
