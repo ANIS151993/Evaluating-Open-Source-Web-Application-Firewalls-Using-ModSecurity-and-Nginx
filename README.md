@@ -36,6 +36,10 @@ standard 4-vCPU / 4GB cloud hardware achieves:
 
 ...at **zero licensing cost**, fully reproducible, MIT-licensed artifacts included.
 
+<div align="center">
+<img src="docs/assets/infographic.jpg" width="90%" alt="Infographic summarizing detection, false-positive, latency, and cost results">
+</div>
+
 ## 📖 Table of Contents
 
 - [Abstract](#-abstract)

@@ -21,3 +21,10 @@ __pycache__/
 # Duplicate figure copies live at repo root from earlier drafts; the
 # canonical, site-referenced copies are under docs/assets/figures/.
 /fig*.png
+
+# Working notes containing a live GitHub access token -- never commit this.
+/Prompt.md
+
+# Original oversized infographic; the optimized, web-sized copy actually
+# used by the site/README lives at docs/assets/infographic.jpg.
+/Open-Source_Firewall_Benefits_Infographic.png
