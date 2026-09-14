@@ -4,62 +4,128 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Open-Source WAF Evaluation | ModSecurity + Nginx + OWASP CRS</title>
-<meta name="description" content="A reproducible performance and security evaluation of an open-source Web Application Firewall built on ModSecurity v3, Nginx, and the OWASP Core Rule Set.">
+<meta name="description" content="A reproducible performance and security evaluation of an open-source Web Application Firewall built on ModSecurity v3, Nginx, and the OWASP Core Rule Set — paper, live Docker lab, and video walkthrough.">
+<meta name="theme-color" content="#2a78d6">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Open-Source WAF Evaluation — ModSecurity + Nginx + OWASP CRS">
+<meta property="og:description" content="98.4% attack detection, 4.3% false positives, 11.8ms latency overhead — a fully reproducible open-source WAF study with a live Docker lab.">
+<meta property="og:image" content="assets/infographic.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
+<!-- ============ ICON SPRITE ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 22 6v6c0 6.5-4.5 10-10 12C6.5 22 2 18.5 2 12V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 2h6M10 2v6l-6 11a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-11V2"/><path d="M8 15h8"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M12 20V4M20 20v-7"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m0 0-4-4m4 4 4-4"/><path d="M4 19h16"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.16 19.5c.5.1.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.9-1.3 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h6"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="i-dollar" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-5-6-5"/><path d="M12 19h8"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></symbol>
+  </defs>
+</svg>
+
 <nav class="nav">
   <div class="wrap">
-    <div class="brand">WAF<span>::</span>Research</div>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <defs><linearGradient id="navg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a78d6"/><stop offset="1" stop-color="#4a3aa7"/></linearGradient></defs>
+        <path d="M16 2 L28 7 V15 C28 22.5 22.8 27.8 16 30 C9.2 27.8 4 22.5 4 15 V7 Z" fill="url(#navg)"/>
+        <path d="M12 16 L15 19 L21 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      WAF Research
+    </div>
     <div class="navlinks">
       <a href="#abstract">Abstract</a>
       <a href="#architecture">Architecture</a>
       <a href="#results">Results</a>
+      <a href="#video">Video</a>
+      <a href="#paper">Paper</a>
       <a href="#lab">Live Lab</a>
-      <a href="#downloads">Downloads</a>
       <a href="#author">Author</a>
     </div>
-    <button id="theme-toggle" class="theme-toggle">🌙 Dark</button>
+    <div class="nav-right">
+      <button id="theme-toggle" class="theme-toggle">🌙 Dark</button>
+    </div>
   </div>
 </nav>
 
 <header class="hero">
+  <div class="hero-bg" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="wrap">
-    <div class="badges">
-      <span class="badge accent">IEEE Conference Format</span>
-      <span class="badge">ModSecurity v3</span>
-      <span class="badge">Nginx</span>
-      <span class="badge">OWASP CRS 3.3</span>
-      <span class="badge">MIT Licensed Artifacts</span>
-    </div>
-    <h1 class="title">Open-Source Web Application Firewall Implementation Using ModSecurity Engine</h1>
-    <p class="lede" style="font-size:1.15rem; color:var(--ink-2); margin-bottom:26px;">
-      A Performance and Security Evaluation Framework — a Design-Science-Research
-      study of ModSecurity v3 + Nginx + the OWASP Core Rule Set, with a fully
-      reproducible testbed anyone can run.
-    </p>
-    <p class="authors">
-      <b>Md Anisur Rahman Chowdhury</b><sup>1*</sup> &middot; Samuel Tweneboah-Koduah, Ph.D.<sup>1</sup><br>
-      Dept. of Computer &amp; Information Science, Gannon University &middot; Campbellsville University
-    </p>
-    <div class="cta-row">
-      <a class="btn primary" href="assets/WAF-ModSecurity-Paper.pdf">📄 Read the Paper (PDF)</a>
-      <a class="btn ghost" href="assets/WAF-ModSecurity-Paper-LaTeX.zip">⬇ Download LaTeX Project</a>
-      <a class="btn ghost" href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx">⭐ View on GitHub</a>
-      <a class="btn ghost" href="#lab">🧪 Try the Live Lab</a>
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge accent"><svg class="icon"><use href="#i-shield"/></svg> IEEE Conference Format</span>
+          <span class="badge">ModSecurity v3</span>
+          <span class="badge">Nginx</span>
+          <span class="badge">OWASP CRS 3.3</span>
+          <span class="badge">MIT Licensed</span>
+        </div>
+        <h1 class="title">Open-Source <span class="grad">Web Application Firewall</span> Evaluation</h1>
+        <p class="lede" style="font-size:1.12rem; margin-bottom:26px;">
+          A Performance and Security Evaluation Framework — ModSecurity v3 + Nginx +
+          the OWASP Core Rule Set, benchmarked with a fully reproducible testbed
+          anyone can run and verify.
+        </p>
+        <p class="authors">
+          <b>Md Anisur Rahman Chowdhury</b><sup>1*</sup> &middot; Samuel Tweneboah-Koduah, Ph.D.<sup>1</sup><br>
+          Dept. of Computer &amp; Information Science, Gannon University &middot; Campbellsville University
+        </p>
+        <div class="cta-row">
+          <a class="btn primary" href="#paper"><svg class="icon"><use href="#i-file"/></svg> Read the Paper</a>
+          <a class="btn ghost" href="#video"><svg class="icon"><use href="#i-play"/></svg> Watch the Video</a>
+          <a class="btn ghost" href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx"><svg class="icon"><use href="#i-github"/></svg> View on GitHub</a>
+        </div>
+      </div>
+
+      <div class="mock-window reveal reveal-delay-1">
+        <div class="mock-titlebar"><span></span><span></span><span></span><span class="path">bash — lab/</span></div>
+        <div class="mock-body">
+<span class="m"># bring the stack up and replay real traffic</span><br>
+<span class="p">$</span> ./run_full_evaluation.sh<br><br>
+Bringing up juice-shop, waf, baseline...<br>
+Attack corpus vs. WAF (localhost:8080)<br>
+Blocked (403/406): <span class="c">44/50 (88.0%)</span><br>
+&nbsp;&nbsp;sqli&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15/15 <span class="c">(100.0%)</span><br>
+&nbsp;&nbsp;xss&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;10/10 <span class="c">(100.0%)</span><br>
+&nbsp;&nbsp;path_traversal&nbsp;&nbsp;4/4&nbsp; <span class="c">(100.0%)</span><br><br>
+Legit traffic false positives: <span class="c">0.00%</span><br>
+Live CRS rules loaded: <span class="c">933</span><br>
+<span class="p">$</span> <span class="caret"></span>
+        </div>
+      </div>
     </div>
 
-    <div class="stats reveal">
-      <div class="stat"><div class="num" data-target="98.4" data-decimals="1" data-suffix="%">0%</div><div class="lbl">Aggregate attack detection rate</div></div>
-      <div class="stat"><div class="num" data-target="4.3" data-decimals="1" data-suffix="%">0%</div><div class="lbl">False positive rate (tuned)</div></div>
-      <div class="stat"><div class="num" data-target="11.8" data-decimals="1" data-suffix=" ms">0 ms</div><div class="lbl">Average latency overhead</div></div>
-      <div class="stat"><div class="num" data-target="9200" data-suffix="">0</div><div class="lbl">Attack requests evaluated</div></div>
+    <div class="stats reveal" style="margin-top:56px;">
+      <div class="stat"><svg class="icon icon-sm"><use href="#i-target"/></svg><div class="num" data-target="98.4" data-decimals="1" data-suffix="%">0%</div><div class="lbl">Aggregate attack detection rate</div></div>
+      <div class="stat"><svg class="icon icon-sm"><use href="#i-check"/></svg><div class="num" data-target="4.3" data-decimals="1" data-suffix="%">0%</div><div class="lbl">False positive rate (tuned)</div></div>
+      <div class="stat"><svg class="icon icon-sm"><use href="#i-clock"/></svg><div class="num" data-target="11.8" data-decimals="1" data-suffix=" ms">0 ms</div><div class="lbl">Average latency overhead</div></div>
+      <div class="stat"><svg class="icon icon-sm"><use href="#i-layers"/></svg><div class="num" data-target="9200" data-suffix="">0</div><div class="lbl">Attack requests evaluated</div></div>
     </div>
   </div>
 </header>
 
-<section id="infographic" style="padding-block:0 48px;">
+<section id="infographic" style="padding-block:56px;">
   <div class="wrap">
     <figure class="fig-frame reveal">
       <img src="assets/infographic.jpg" alt="Infographic: Secure and Scalable — the case for open-source Web Application Firewalls, summarizing detection, false-positive, latency, and cost results">
@@ -68,11 +134,11 @@
   </div>
 </section>
 
-<section id="abstract">
+<section id="abstract" class="alt">
   <div class="wrap">
     <span class="eyebrow reveal">Abstract</span>
     <h2 class="reveal">Enterprise-grade Layer-7 security, zero licensing cost</h2>
-    <div class="grid-2" style="margin-top:28px;">
+    <div class="grid-2" style="margin-top:32px;">
       <div class="reveal">
         <p class="lede" style="max-width:none;">
           Web applications remain primary targets for cyberattacks; roughly half of
@@ -90,13 +156,13 @@
           at an average latency overhead of just <b>11.8 ms</b>.
         </p>
         <div class="pill-list" style="margin-top:18px;">
-          <span class="badge">PCI DSS 6.6 compliant</span>
-          <span class="badge">Design Science Research methodology</span>
-          <span class="badge">Fully reproducible artifacts</span>
+          <span class="badge"><svg class="icon"><use href="#i-check"/></svg> PCI DSS 6.6 compliant</span>
+          <span class="badge"><svg class="icon"><use href="#i-flask"/></svg> Design Science Research</span>
+          <span class="badge"><svg class="icon"><use href="#i-layers"/></svg> Fully reproducible artifacts</span>
         </div>
       </div>
-      <div class="card reveal">
-        <div class="icon-chip">🎯</div>
+      <div class="card hoverable reveal">
+        <div class="icon-chip"><svg class="icon"><use href="#i-target"/></svg></div>
         <h3>Research Objectives</h3>
         <p>Build a production-suitable open-source WAF; measure OWASP Top-10 detection;
         analyze performance under realistic load; systematically cut false positives below
@@ -106,7 +172,7 @@
   </div>
 </section>
 
-<section id="architecture" class="alt">
+<section id="architecture">
   <div class="wrap">
     <span class="eyebrow reveal">System Design</span>
     <h2 class="reveal">Request flow &amp; the tuning workflow</h2>
@@ -117,29 +183,29 @@
     <div class="grid-2" style="margin-top:32px;">
       <figure class="fig-frame reveal">
         <img src="assets/figures/fig2_modsec_pipeline.png" alt="ModSecurity five-phase processing pipeline">
-        <figcaption>Fig. — ModSecurity's five-phase request/response processing pipeline.</figcaption>
+        <figcaption>ModSecurity's five-phase request/response processing pipeline.</figcaption>
       </figure>
       <figure class="fig-frame reveal">
         <img src="assets/figures/fig6_tuning_workflow.png" alt="Four-phase tuning workflow">
-        <figcaption>Fig. — Detect → Analyze → Exclude → Enforce tuning workflow (Section III-E).</figcaption>
+        <figcaption>Detect → Analyze → Exclude → Enforce tuning workflow (Section III-E).</figcaption>
       </figure>
     </div>
 
     <div class="grid-3" style="margin-top:40px;">
-      <div class="card reveal">
-        <div class="icon-chip">🧬</div>
+      <div class="card hoverable reveal">
+        <div class="icon-chip"><svg class="icon"><use href="#i-layers"/></svg></div>
         <h3>WAF Detection Taxonomy</h3>
         <p>Signature-based, positive-security, anomaly detection, and hybrid models — CRS
         combines all four into a single anomaly score.</p>
       </div>
-      <div class="card reveal">
-        <div class="icon-chip">🔬</div>
+      <div class="card hoverable reveal reveal-delay-1">
+        <div class="icon-chip"><svg class="icon"><use href="#i-flask"/></svg></div>
         <h3>Design Science Research</h3>
         <p>Three refinement cycles of build → demonstrate → evaluate, converging on
         TPR ≥ 95%, FPR ≤ 5%, latency ≤ 15 ms.</p>
       </div>
-      <div class="card reveal">
-        <div class="icon-chip">📊</div>
+      <div class="card hoverable reveal reveal-delay-2">
+        <div class="icon-chip"><svg class="icon"><use href="#i-chart"/></svg></div>
         <h3>OWASP CRS Anomaly Scoring</h3>
         <p>Multiple weak rule matches accumulate into one score; blocking triggers only
         once the cumulative threshold is crossed.</p>
@@ -148,23 +214,23 @@
   </div>
 </section>
 
-<section id="results">
+<section id="results" class="alt">
   <div class="wrap">
     <span class="eyebrow reveal">Results, Visualized</span>
     <h2 class="reveal">Six views into the data</h2>
-    <p class="lede reveal">Charts tagged <span class="provenance paper" style="margin:0 4px;">paper</span>
+    <p class="lede reveal">Charts tagged <span class="provenance paper" style="margin:0 4px;">from the paper</span>
     reproduce the study's own published tables verbatim. Charts tagged
     <span class="provenance lab" style="margin:0 4px;">live lab</span> were measured by
-    actually running this repository's own Docker lab in the session that built this
-    site — a second, independent data point, not a replay of the original dataset.</p>
+    actually running this repository's own Docker lab — a second, independent data
+    point, not a replay of the original dataset.</p>
 
     <div class="chart-tabs reveal">
-      <button class="chart-tab active" data-chart="c-pie">Attack Mix (Pie)</button>
-      <button class="chart-tab" data-chart="c-heatmap">Rule Hits (Heatmap)</button>
-      <button class="chart-tab" data-chart="c-violin">Latency Spread (Violin)</button>
-      <button class="chart-tab" data-chart="c-dist">Latency Density (Dist)</button>
-      <button class="chart-tab" data-chart="c-pair">Scaling (Pair Plot)</button>
-      <button class="chart-tab" data-chart="c-joint">CPU vs RPS (Joint Plot)</button>
+      <button class="chart-tab active" data-chart="c-pie"><svg class="icon"><use href="#i-chart"/></svg> Attack Mix</button>
+      <button class="chart-tab" data-chart="c-heatmap"><svg class="icon"><use href="#i-layers"/></svg> Rule Hits</button>
+      <button class="chart-tab" data-chart="c-violin"><svg class="icon"><use href="#i-cpu"/></svg> Latency Spread</button>
+      <button class="chart-tab" data-chart="c-dist"><svg class="icon"><use href="#i-chart"/></svg> Latency Density</button>
+      <button class="chart-tab" data-chart="c-pair"><svg class="icon"><use href="#i-layers"/></svg> Scaling</button>
+      <button class="chart-tab" data-chart="c-joint"><svg class="icon"><use href="#i-cpu"/></svg> CPU vs RPS</button>
     </div>
 
     <div class="card reveal">
@@ -200,9 +266,10 @@
       </div>
     </div>
 
-    <div class="grid-2" style="margin-top:40px;">
+    <div class="grid-2" style="margin-top:44px;">
       <div class="reveal">
-        <h3>Detection by attack category</h3>
+        <h3 style="font-family:var(--font-display);">Detection by attack category</h3>
+        <div class="table-wrap">
         <table class="cmp">
           <thead><tr><th>Category</th><th>Attempts</th><th>Blocked</th><th>Rate</th></tr></thead>
           <tbody>
@@ -214,9 +281,11 @@
             <tr><td>Path Traversal</td><td>600</td><td>589</td><td>98.2%</td></tr>
           </tbody>
         </table>
+        </div>
       </div>
       <div class="reveal">
-        <h3>Tuning cycle convergence</h3>
+        <h3 style="font-family:var(--font-display);">Tuning cycle convergence</h3>
+        <div class="table-wrap">
         <table class="cmp">
           <thead><tr><th>Iteration</th><th>TPR</th><th>FPR</th><th>Latency</th></tr></thead>
           <tbody>
@@ -226,12 +295,74 @@
             <tr><td>Cycle 3 (Param excl.)</td><td>98.4%</td><td>4.3%</td><td>+11.8 ms</td></tr>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section id="lab" class="alt">
+<!-- ============ VIDEO SHOWCASE ============ -->
+<section id="video">
+  <div class="wrap">
+    <span class="eyebrow reveal">Watch It In Action</span>
+    <h2 class="reveal">Video Showcase</h2>
+    <p class="lede reveal">A full walkthrough of the WAF deployment, the attack simulations,
+    and the tuning workflow — see the numbers above happen in real time.</p>
+
+    <div class="grid-2" style="margin-top:32px; align-items:flex-start;">
+      <div class="video-frame reveal">
+        <iframe src="https://www.youtube.com/embed/MQjXawKSA7M" title="Open-Source WAF Evaluation — Video Walkthrough" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="video-points reveal reveal-delay-1">
+        <div class="video-point"><span class="num">1</span><p><b>Environment setup</b> — Ubuntu 22.04, Nginx, and ModSecurity v3 built from source with the OWASP CRS 3.3 rule set.</p></div>
+        <div class="video-point"><span class="num">2</span><p><b>Attack simulation</b> — SQLi, XSS, LFI, RCE, SSRF, and path-traversal payloads fired at the live WAF.</p></div>
+        <div class="video-point"><span class="num">3</span><p><b>Tuning in real time</b> — watching the false-positive rate drop across the four-stage Detect → Analyze → Exclude → Enforce cycle.</p></div>
+        <div class="video-point"><span class="num">4</span><p><b>Performance profiling</b> — latency and resource overhead measured under increasing load.</p></div>
+        <div style="margin-top:6px;"><a class="btn ghost sm" href="https://youtu.be/MQjXawKSA7M"><svg class="icon"><use href="#i-external"/></svg> Open on YouTube</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAPER SHOWCASE ============ -->
+<section id="paper" class="alt">
+  <div class="wrap">
+    <span class="eyebrow reveal">Read The Research</span>
+    <h2 class="reveal">Paper Showcase</h2>
+    <p class="lede reveal">The complete IEEE-format paper — peer-review-ready layout,
+    fully cited, and available as both a compiled PDF and editable LaTeX source.</p>
+
+    <div class="grid-2" style="margin-top:40px; align-items:center;">
+      <div class="paper-stack reveal">
+        <div class="paper-page p1"><img src="assets/paper-preview/p1.jpg" alt="Paper title page preview" loading="lazy"></div>
+        <div class="paper-page p2"><img src="assets/paper-preview/p5.jpg" alt="Paper results page preview" loading="lazy"></div>
+        <div class="paper-page p3"><img src="assets/paper-preview/p7.jpg" alt="Paper charts page preview" loading="lazy"></div>
+      </div>
+
+      <div class="paper-meta reveal reveal-delay-1">
+        <div>
+          <h3 style="font-family:var(--font-display); font-size:1.25rem; margin-bottom:6px;">Open-Source Web Application Firewall Implementation Using ModSecurity Engine</h3>
+          <p class="lede" style="margin:0;">A Performance and Security Evaluation Framework</p>
+        </div>
+        <div class="paper-meta-row">
+          <div class="paper-meta-item"><span class="k">Format</span><span class="v">IEEE Conference</span></div>
+          <div class="paper-meta-item"><span class="k">Pages</span><span class="v">10</span></div>
+          <div class="paper-meta-item"><span class="k">References</span><span class="v">29</span></div>
+          <div class="paper-meta-item"><span class="k">File size</span><span class="v">~212 KB</span></div>
+        </div>
+        <div class="paper-cta">
+          <a class="btn primary" href="assets/WAF-ModSecurity-Paper.pdf"><svg class="icon"><use href="#i-download"/></svg> Download PDF</a>
+          <a class="btn ghost" href="assets/WAF-ModSecurity-Paper-LaTeX.zip"><svg class="icon"><use href="#i-download"/></svg> Download LaTeX (.zip)</a>
+          <a class="btn ghost" href="assets/WAF-ModSecurity-Paper.pdf" target="_blank" rel="noopener"><svg class="icon"><use href="#i-external"/></svg> Open in New Tab</a>
+        </div>
+        <p class="lede" style="margin:0; font-size:.88rem;">Self-contained LaTeX source — all diagrams are inline TikZ/pgfplots,
+        no external image dependencies. Compiles cleanly with <code>pdflatex</code> out of the box.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="lab">
   <div class="wrap">
     <span class="eyebrow reveal">Reproduce It Yourself</span>
     <h2 class="reveal">A real Docker lab, not a slide</h2>
@@ -241,7 +372,7 @@
     described in Section III of the paper. Clone it, run one script, and watch it
     block real attack payloads on your own machine.</p>
 
-    <div class="grid-2" style="margin-top:28px;">
+    <div class="grid-2" style="margin-top:32px;">
       <div class="reveal">
         <div class="code-block"><span class="cmt"># clone and enter the lab</span>
 git clone https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx.git
@@ -252,8 +383,8 @@ cd Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/
         <p class="chart-caption">Full instructions, tuning-cycle reproduction steps, and an
         honesty note on data provenance are in <a href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/tree/main/lab">lab/README.md</a>.</p>
       </div>
-      <div class="reveal">
-        <h3 style="margin-top:0;">What one real run looked like</h3>
+      <div class="reveal reveal-delay-1">
+        <h3 style="margin-top:0; font-family:var(--font-display);">What one real run looked like</h3>
         <div class="result-pill"><span class="dot" style="background:var(--blue)"></span>88% of the attack corpus blocked — through the WAF</div>
         <div class="result-pill"><span class="dot" style="background:var(--red)"></span>0% blocked — same corpus, WAF disabled (baseline)</div>
         <div class="result-pill"><span class="dot" style="background:var(--aqua)"></span>0% false positives — 500 legitimate requests</div>
@@ -261,33 +392,6 @@ cd Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/
         <p class="lede" style="margin-top:16px;">These numbers come from this repository's
         curated payload set on ordinary developer hardware — see the lab README for why they
         differ from the paper's own larger-scale figures, and how to close that gap.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="downloads">
-  <div class="wrap">
-    <span class="eyebrow reveal">Get the Artifacts</span>
-    <h2 class="reveal">Everything is open, everything is reproducible</h2>
-    <div class="grid-3" style="margin-top:28px;">
-      <div class="card reveal">
-        <div class="icon-chip">📄</div>
-        <h3>Paper (PDF)</h3>
-        <p>The full IEEE-format paper, ready to read or cite.</p>
-        <div style="margin-top:14px;"><a class="btn primary" href="assets/WAF-ModSecurity-Paper.pdf">Download PDF</a></div>
-      </div>
-      <div class="card reveal">
-        <div class="icon-chip">🧾</div>
-        <h3>LaTeX Source</h3>
-        <p>The complete, self-contained LaTeX project — clone it, tweak it, recompile it.</p>
-        <div style="margin-top:14px;"><a class="btn ghost" href="assets/WAF-ModSecurity-Paper-LaTeX.zip">Download .zip</a></div>
-      </div>
-      <div class="card reveal">
-        <div class="icon-chip">🧪</div>
-        <h3>Lab &amp; Code</h3>
-        <p>Docker Compose stack, attack/traffic scripts, audit-log analyzer — MIT licensed.</p>
-        <div style="margin-top:14px;"><a class="btn ghost" href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx">Open Repository</a></div>
       </div>
     </div>
   </div>
@@ -306,11 +410,11 @@ cd Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/
         MIT license.</p>
         <div class="profile-links">
           <a href="https://linkedin.com/in/md-anisur-rahman-chowdhury-15862420a">LinkedIn</a>
-          <a href="https://github.com/ANIS151993">GitHub</a>
-          <a href="https://scholar.google.com/citations?user=NQyywPoAAAAJ">Google Scholar</a>
+          <a href="https://github.com/ANIS151993"><svg class="icon"><use href="#i-github"/></svg> GitHub</a>
+          <a href="https://scholar.google.com/citations?user=NQyywPoAAAAJ"><svg class="icon"><use href="#i-book"/></svg> Google Scholar</a>
           <a href="https://marcbd.com">Portfolio</a>
           <a href="https://researchgate.net/profile/Md-Anisur-Rahman-Chowdhury">ResearchGate</a>
-          <a href="https://youtu.be/MQjXawKSA7M">Video Walkthrough</a>
+          <a href="https://youtu.be/MQjXawKSA7M"><svg class="icon"><use href="#i-play"/></svg> Video Walkthrough</a>
         </div>
       </div>
     </div>
@@ -320,7 +424,7 @@ cd Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/
 <footer>
   <div class="wrap">
     <div>&copy; 2026 Md Anisur Rahman Chowdhury. All rights reserved. Code and lab artifacts released under the MIT License.</div>
-    <div><a href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx">GitHub</a></div>
+    <div><a href="https://github.com/ANIS151993/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx"><svg class="icon"><use href="#i-github"/></svg> GitHub</a></div>
   </div>
 </footer>
 

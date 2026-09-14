@@ -45,6 +45,7 @@ standard 4-vCPU / 4GB cloud hardware achieves:
 - [Abstract](#-abstract)
 - [Results, Visualized](#-results-visualized)
 - [System Architecture](#-system-architecture)
+- [Video Showcase](#-video-showcase)
 - [The Reproducible Lab](#-the-reproducible-lab)
 - [Repository Structure](#-repository-structure)
 - [Downloads](#-downloads)
@@ -150,6 +151,20 @@ Client ──▶ Nginx + ModSecurity v3 (OWASP CRS 3.3) ──▶ Backend Applic
 
 Full architecture diagrams, the anomaly-scoring model, and the tuning
 methodology are in Sections II–III of the paper.
+
+## 🎬 Video Showcase
+
+<div align="center">
+
+[![Watch the video walkthrough](docs/assets/paper-preview/p1.jpg)](https://youtu.be/MQjXawKSA7M)
+
+**[▶ Watch on YouTube: environment setup, live attack simulation, and the tuning workflow](https://youtu.be/MQjXawKSA7M)**
+
+</div>
+
+An embedded, full-width player plus a chaptered breakdown (setup → attack
+simulation → live tuning → performance profiling) is on the
+[website's Video Showcase section](https://anis151993.github.io/Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/#video).
 
 ## 🧪 The Reproducible Lab
 
