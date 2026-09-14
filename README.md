@@ -186,22 +186,31 @@ reproduce each of the paper's four tuning cycles.
 
 ```
 .
-├── main.tex                        # Self-contained IEEE-format LaTeX source
+├── main.tex                        # IEEE-format LaTeX source
+├── references.bib                  # BibTeX bibliography (IEEEtran style)
+├── figures/                        # All 9 figures referenced by main.tex
 ├── main.pdf                        # Compiled paper
 ├── LICENSE                         # MIT (code/lab/site) — see note for paper text
 ├── docs/                           # GitHub Pages website (this repo's /docs)
 │   ├── index.html
 │   └── assets/
 │       ├── charts/                 # The 6 chart images (see above)
-│       ├── figures/                # Paper diagram exports
+│       ├── figures/                # Copies of the paper's figures, for the site
+│       ├── paper-preview/          # Page-preview thumbnails for the Paper Showcase
 │       ├── WAF-ModSecurity-Paper.pdf
-│       └── WAF-ModSecurity-Paper-LaTeX.zip
+│       └── WAF-ModSecurity-Paper-LaTeX.zip   # Full Overleaf-ready project
 └── lab/                            # Reproducible Docker lab
     ├── docker-compose.yml
     ├── nginx/custom-rules.conf
     ├── scripts/                    # attack corpus, traffic gen, analyzer, chart builder
     └── run_full_evaluation.sh
 ```
+
+> **Note:** `WAF-ModSecurity-Paper-LaTeX.zip` is a complete, self-contained
+> Overleaf project — `main.tex` + `references.bib` + every figure in
+> `figures/` + a compile-instructions README. It includes two placeholder
+> spots (a prior-publication citation and the author biographies) clearly
+> marked `PLACEHOLDER`/`TODO` for you to fill in before submission.
 
 ## ⬇ Downloads
 

@@ -6,6 +6,10 @@
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+*.bbl
+*.blg
+*.bcf
+*.run.xml
 
 # Lab run outputs (regenerate with lab/run_full_evaluation.sh)
 lab/results/*

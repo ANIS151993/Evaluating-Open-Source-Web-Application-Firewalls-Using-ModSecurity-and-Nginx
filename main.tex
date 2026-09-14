@@ -17,14 +17,12 @@
 \usepackage{float}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
-% TikZ styles for diagrams
-\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text width=2.8cm, align=center, draw=black, fill=red!30]
+% TikZ styles for the system architecture diagram (Fig. 5) -- the only
+% remaining inline TikZ figure; all other diagrams use pre-rendered images
+% in figures/ for faster, more portable compilation.
 \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text width=2.8cm, align=center, draw=black, fill=orange!30]
-\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text width=2.2cm, align=center, draw=black, fill=green!30]
 \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text width=2.6cm, align=center, draw=black, fill=blue!30]
 \tikzstyle{arrow} = [thick,->,>=stealth]
-\tikzstyle{block} = [rectangle, draw, fill=blue!20, text width=6em, text centered, rounded corners, minimum height=3em]
-\tikzstyle{line} = [draw, -latex']
 
 \begin{document}
 
@@ -59,6 +57,8 @@ Network firewalls, intrusion detection systems, and VPN gateways are examples of
 Operating at layer 7 of the OSI model and analyzing the structures of HTTP requests and responses to identify attack patterns using signature matching, anomaly detection, or positive security models, web application firewalls (WAFs) bridge this security gap.\cite{manaseer2018,philip2023}. Although commercial WAF solutions from companies such as Akamai, Imperva, and F5 provide robust protection, they are prohibitively expensive for small and medium-sized enterprises (SMEs), academic institutions, and non-profit organizations due to annual licensing fees that range from \$60,000 to \$200,000 per application cluster. \cite{appsentinels2025,indusface2025}.
 
 Alternative open-source solutions provide functionally identical capabilities without any licensing costs, especially ModSecurity combined with the OWASP Core Rule Set. \cite{owasp_modsec,mukhtar2020}. Nevertheless, there are four significant gaps in the existing literature: (1) inconsistent performance evaluation criteria across different hardware platforms; (2) a lack of reproducible deployment artifacts, hindering independent verification; (3) insufficient guidance on reducing false positives through systematic rule tuning; and (4) limited empirical data on effectiveness against modern attack variants under realistic workload conditions. \cite{pratama2023,gzyl2023}.
+
+This work is part of a broader research program on Layer-7 threat detection; a companion study by the authors investigated a serverless, cloud-native intrusion-prevention architecture \cite{chowdhury2025serverless}, and the present paper complements that direction by targeting organizations that self-host their infrastructure and cannot rely on managed cloud security services.
 
 \subsection{Research Objectives and Contributions}
 
@@ -96,27 +96,9 @@ A special type of application-level security device, called a web application fi
 
 The detection mechanisms employed by WAFs fall into four primary categories, as illustrated in Figure \ref{fig:waf_detection}, each offering distinct trade-offs between coverage, accuracy, and operational complexity \cite{darmawan2024,omar2023}.
 
-\begin{figure}[!t]\small
+\begin{figure}[!t]
 \centering
-\begin{tikzpicture}[node distance=2cm]
-\node (waf) [block, fill=blue!40] {WAF Detection Mechanisms};
-\node (sig) [block, below left of=waf, xshift=-1.5cm, yshift=-0.5cm] {Signature-Based};
-\node (pos) [block, below of=waf, yshift=-0.5cm] {Positive Security};
-\node (anom) [block, below right of=waf, xshift=0.5cm, yshift=-0.5cm] {Anomaly Detection};
-\node (hybrid) [block, below of=pos, yshift=-0.5cm] {Hybrid Models};
-
-\draw [arrow] (waf) -- (sig);
-\draw [arrow] (waf) -- (pos);
-\draw [arrow] (waf) -- (anom);
-\draw [arrow] (sig) -- (hybrid);
-\draw [arrow] (pos) -- (hybrid);
-\draw [arrow] (anom) -- (hybrid);
-
-\node [below of=sig, yshift=0.2cm, text width=3cm, font=\tiny] {Known patterns\\High precision\\Zero-day blind};
-\node [below of=pos, yshift=0.2cm, text width=3cm, font=\tiny] {Strict schemas\\API-friendly\\Complex sites};
-\node [below of=anom, yshift=0.2cm, text width=3cm, font=\tiny] {Statistical baselines\\Zero-day resilient\\False positives};
-\node [below of=hybrid, yshift=0.2cm, text width=3cm, font=\tiny] {Combined approach\\Balanced coverage\\OWASP CRS};
-\end{tikzpicture}
+\includegraphics[width=\columnwidth]{figures/fig1_waf_taxonomy.png}
 \caption{WAF Detection Mechanism Taxonomy}
 \label{fig:waf_detection}
 \end{figure}
@@ -139,24 +121,7 @@ The five sequential stages of the ModSecurity processing pipeline are shown in t
 
 \begin{figure}[!t]
 \centering
-\begin{tikzpicture}[node distance=1.5cm, auto]
-\node [process] (p1) {Request Headers};
-\node [process, below of=p1] (p2) {Request Body};
-\node [process, below of=p2] (p3) {Response Headers};
-\node [process, below of=p3] (p4) {Response Body};
-\node [process, below of=p4] (p5) {Logging};
-
-\draw [arrow] (p1) -- node[right, font=\scriptsize] {Parse method, URI, headers} (p2);
-\draw [arrow] (p2) -- node[right, font=\scriptsize] {Parse POST/PUT payloads} (p3);
-\draw [arrow] (p3) -- node[right, font=\scriptsize] {Inspect server headers} (p4);
-\draw [arrow] (p4) -- node[right, font=\scriptsize] {Scan response content} (p5);
-
-\node [left of=p1, xshift=-2cm, font=\scriptsize] {\textbf{Phase 1}};
-\node [left of=p2, xshift=-2cm, font=\scriptsize] {\textbf{Phase 2}};
-\node [left of=p3, xshift=-2cm, font=\scriptsize] {\textbf{Phase 3}};
-\node [left of=p4, xshift=-2cm, font=\scriptsize] {\textbf{Phase 4}};
-\node [left of=p5, xshift=-2cm, font=\scriptsize] {\textbf{Phase 5}};
-\end{tikzpicture}
+\includegraphics[width=\columnwidth]{figures/fig2_modsec_pipeline.png}
 \caption{ModSecurity Five-Phase Processing Pipeline}
 \label{fig:modsec_pipeline}
 \end{figure}
@@ -175,39 +140,9 @@ Using an anomaly scoring model, CRS adds a numerical score (from 1 to 5) to the 
 
 The anomaly scoring mechanism is illustrated in Figure \ref{fig:anomaly_scoring}, demonstrating how multiple weak signals combine to produce a strong blocking decision.
 
-\begin{figure}[!t]\small
+\begin{figure}[!t]
 \centering
-\resizebox{\columnwidth}{!}{%
-\begin{tikzpicture}[scale=0.85]
-% Rules
-\node[process, minimum width=2.5cm, minimum height=0.8cm] (r1) at (0,4) {Rule 942100: +3};
-\node[process, minimum width=2.5cm, minimum height=0.8cm] (r2) at (0,3) {Rule 941110: +2};
-\node[process, minimum width=2.5cm, minimum height=0.8cm] (r3) at (0,2) {Rule 930120: +1};
-\node[process, minimum width=2.5cm, minimum height=0.8cm] (r4) at (0,1) {Rule 920280: +1};
-
-% Accumulator
-\node[process, fill=orange!40, minimum width=2.5cm, minimum height=1.2cm] (acc) at (4,2.5) {Score\\Accumulator};
-
-% Decision
-\node[decision, fill=red!30, minimum width=2cm, minimum height=1.2cm] (dec) at (8,2.5) {Score $\geq$ 5?};
-
-% Outcomes
-\node[process, fill=green!40] (allow) at (11,4) {Allow (200)};
-\node[process, fill=red!60] (block) at (11,1) {Block (406)};
-
-% Arrows
-\draw[arrow] (r1) -- (acc);
-\draw[arrow] (r2) -- (acc);
-\draw[arrow] (r3) -- (acc);
-\draw[arrow] (r4) -- (acc);
-\draw[arrow] (acc) -- (dec);
-\draw [arrow] (dec) -- node[above, font=\scriptsize] {No} (allow);
-\draw[arrow] (dec) -- node[above, font=\scriptsize, xshift=-0.5cm] {Yes} (block);
-
-% Total annotation
-\node[font=\scriptsize\bf] at (4,0.3) {Total: 3+2+1+1=7};
-\end{tikzpicture}%
-}
+\includegraphics[width=\columnwidth]{figures/fig3_crs_scoring.png}
 \caption{OWASP CRS Anomaly Scoring Mechanism}
 \label{fig:anomaly_scoring}
 \end{figure}
@@ -250,21 +185,7 @@ We use DSR in accordance with the five stages shown in the figure \ref{fig:dsr_f
 
 \begin{figure}[!t]
 \centering
-\begin{tikzpicture}[node distance=1.3cm, scale=0.85, every node/.style={scale=0.85}]
-\node (start) [startstop] {Problem Identification};
-\node (obj) [process, below of=start] {Objectives Definition};
-\node (design) [process, below of=obj] {Design \& Development};
-\node (demo) [process, below of=design] {Demonstration};
-\node (eval) [decision, below of=demo, yshift=-0.5cm] {Objectives Met?};
-\node (end) [startstop, right of=eval, xshift=3cm] {Publication};
-
-\draw [arrow] (start) -- (obj);
-\draw [arrow] (obj) -- (design);
-\draw [arrow] (design) -- (demo);
-\draw [arrow] (demo) -- (eval);
-\draw [arrow] (eval) -- node[above, font=\scriptsize] {Yes} (end);
-\draw [arrow] (eval.west) -- ++(-1.5,0) |- node[left, pos=0.25, font=\scriptsize] {No: Iterate} (design.west);
-\end{tikzpicture}
+\includegraphics[width=\columnwidth]{figures/fig4_dsr_flow.png}
 \caption{Design Science Research Process Flow}
 \label{fig:dsr_framework}
 \end{figure}
@@ -387,24 +308,7 @@ As shown in the figure, a four-stage iterative methodology was used over three c
 
 \begin{figure}[!t]
 \centering
-\begin{tikzpicture}[node distance=1.8cm, scale=0.85, every node/.style={scale=0.85}]
-\node (detect) [process, fill=yellow!30] {DETECT\\Log-only mode\\48 hours};
-\node (analyze) [process, below of=detect, fill=orange!30] {ANALYZE\\Parse audit logs\\Identify FP patterns};
-\node (exclude) [process, below of=analyze, fill=cyan!30] {EXCLUDE\\Craft rule exceptions\\Scope to endpoints};
-\node (enforce) [process, below of=exclude, fill=blue!30] {ENFORCE\\Enable blocking\\Measure metrics};
-\node (check) [decision, below of=enforce, yshift=-0.5cm, fill=green!30] {Targets\\Met?};
-\node (done) [startstop, right of=check, xshift=2.5cm] {Production\\Deployment};
-
-\draw [arrow] (detect) -- (analyze);
-\draw [arrow] (analyze) -- (exclude);
-\draw [arrow] (exclude) -- (enforce);
-\draw [arrow] (enforce) -- (check);
-\draw [arrow] (check) -- node[above, font=\scriptsize] {Yes} (done);
-\draw [arrow] (check.west) -- ++(-1.5,0) |- node[left, pos=0.25, font=\scriptsize] {No: Iterate} (analyze.west);
-
-% Targets box
-\node[draw, dashed, fit=(check), inner sep=10pt, label={[font=\scriptsize]below:TPR$\geq$95\%, FPR$\leq$5\%, Latency$\leq$15ms}] {};
-\end{tikzpicture}
+\includegraphics[width=\columnwidth]{figures/fig6_tuning_workflow.png}
 \caption{Four-Phase Tuning Workflow with Convergence Criteria}
 \label{fig:tuning_workflow}
 \end{figure}
@@ -490,30 +394,7 @@ Figure \ref{fig:detection_chart} visualizes the detection rate comparison across
 
 \begin{figure}[!t]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-    ybar,
-    bar width=15pt,
-    width=\columnwidth,
-    height=5cm,
-    ylabel={Detection Rate (\%)},
-    symbolic x coords={SQLi, XSS, LFI, RCE, SSRF, Path},
-    xtick=data,
-    ymin=90, ymax=100,
-    nodes near coords,
-    nodes near coords align={vertical},
-    every node near coord/.append style={font=\tiny},
-    enlarge x limits=0.15,
-    legend style={at={(0.5,-0.15)}, anchor=north, legend columns=-1},
-    ylabel style={font=\small},
-    xlabel style={font=\small},
-    tick label style={font=\scriptsize}
-]
-\addplot coordinates {(SQLi,99.0) (XSS,98.0) (LFI,99.3) (RCE,97.8) (SSRF,95.5) (Path,98.2)};
-\addplot[red, dashed] coordinates {(SQLi,95) (XSS,95) (LFI,95) (RCE,95) (SSRF,95) (Path,95)};
-\legend{Actual Detection, Target (95\%)}
-\end{axis}
-\end{tikzpicture}
+\includegraphics[width=\columnwidth]{figures/fig7_detection_rates.png}
 \caption{Detection Rates Across Attack Categories}
 \label{fig:detection_chart}
 \end{figure}
@@ -550,35 +431,7 @@ Figure \ref{fig:fp_reduction} illustrates the false positive reduction trajector
 
 \begin{figure}[!t]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-    width=\columnwidth,
-    height=5cm,
-    xlabel={Tuning Iteration},
-    ylabel={False Positive Rate (\%)},
-    xmin=0, xmax=3.5,
-    ymin=0, ymax=15,
-    xtick={0,1,2,3},
-    xticklabels={Baseline, Cycle 1, Cycle 2, Cycle 3},
-    ytick={0,5,10,15},
-    legend pos=north east,
-    ymajorgrids=true,
-    grid style=dashed,
-    ylabel style={font=\small},
-    xlabel style={font=\small},
-    tick label style={font=\scriptsize},
-    legend style={font=\tiny}
-]
-\addplot[color=red, mark=square, thick] coordinates {
-    (0,12.4) (1,8.7) (2,6.1) (3,4.3)
-};
-\addplot[color=blue, mark=*, thick] coordinates {
-    (0,96.2) (1,96.8) (2,97.1) (3,98.4)
-};
-\addplot[green, dashed, thick] coordinates {(0,5) (3,5)};
-\legend{FPR (\%), TPR (\%), Target FPR}
-\end{axis}
-\end{tikzpicture}
+\includegraphics[width=\columnwidth]{figures/fig8_fp_reduction.png}
 \caption{False Positive Reduction Across Tuning Iterations}
 \label{fig:fp_reduction}
 \end{figure}
@@ -617,31 +470,7 @@ Figure \ref{fig:latency_graph} visualizes latency overhead scaling with request 
 
 \begin{figure}[!t]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-    width=\columnwidth,
-    height=5.5cm,
-    xlabel={Request Rate (RPS)},
-    ylabel={Median Latency (ms)},
-    xmin=0, xmax=5500,
-    ymin=0, ymax=60,
-    legend pos=north west,
-    ymajorgrids=true,
-    grid style=dashed,
-    ylabel style={font=\small},
-    xlabel style={font=\small},
-    tick label style={font=\scriptsize},
-    legend style={font=\tiny}
-]
-\addplot[color=blue, mark=square, thick] coordinates {
-    (100,8.2) (500,12.3) (1000,23.4) (2500,31.8) (5000,41.7)
-};
-\addplot[color=red, mark=*, thick] coordinates {
-    (100,18.7) (500,23.8) (1000,35.2) (2500,44.1) (5000,54.8)
-};
-\legend{Baseline (No WAF), With WAF Enabled}
-\end{axis}
-\end{tikzpicture}
+\includegraphics[width=\columnwidth]{figures/fig9_latency_scaling.png}
 \caption{Median Latency vs. Request Rate}
 \label{fig:latency_graph}
 \end{figure}
@@ -686,29 +515,7 @@ The linear relationship of resource consumption is shown in Figure \ref{fig:reso
 
 \begin{figure}[!t]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-    width=\columnwidth,
-    height=5cm,
-    xlabel={Request Rate (RPS)},
-    ylabel={CPU Utilization (\%)},
-    xmin=0, xmax=5500,
-    ymin=0, ymax=100,
-    legend pos=north west,
-    ymajorgrids=true,
-    grid style=dashed,
-    ylabel style={font=\small},
-    xlabel style={font=\small},
-    tick label style={font=\scriptsize},
-    legend style={font=\tiny}
-]
-\addplot[color=red, mark=*, thick] coordinates {
-    (1000,37) (2500,55) (5000,82)
-};
-\addplot[color=blue, dashed, thick, domain=0:5500] {8.2 + 0.0147*x};
-\legend{Measured CPU, Linear Fit ($R^2=0.987$)}
-\end{axis}
-\end{tikzpicture}
+\includegraphics[width=\columnwidth]{figures/fig10_cpu_scaling.png}
 \caption{CPU Utilization Scaling with Linear Regression}
 \label{fig:resource_scaling}
 \end{figure}
@@ -779,66 +586,26 @@ The cybersecurity community benefits when all organizations, regardless of finan
 
 The authors express their gratitude to the reviewers for their valuable comments, which helped to improve this work, and also to the OWASP ModSecurity and Core Rule Set development teams for providing excellent open-source security technologies.
 
-\begin{thebibliography}{99}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 
-\bibitem{verizon2024} Verizon Enterprise, ``2024 Data Breach Investigations Report,'' May 2024.
+\vfill
 
-\bibitem{wen2023} S.-F. Wen and B. Katt, ``A quantitative security evaluation and analysis model for web applications,'' \textit{Comput. Secur.}, vol. 135, p. 103532, Dec. 2023.
+\begin{IEEEbiographynophoto}{Md Anisur Rahman Chowdhury}
+is a graduate researcher in the Dept. of Computer and Information Science at
+Gannon University, USA. His research focuses on open-source and cloud-native
+Layer-7 security, including web application firewalls and serverless
+intrusion-prevention architectures. He maintains reproducible research
+artifacts for his published work at \url{github.com/ANIS151993}.
+\textit{[Author: please review/replace this biography with your preferred
+wording before final submission.]}
+\end{IEEEbiographynophoto}
 
-\bibitem{welekar2024} R. Welekar et al., ``Web application firewall,'' in \textit{Proc. 2nd Int. Conf. Trends Material Sci. Manufacturing Eng.}, 2024, p. 020050.
-
-\bibitem{alotaibi2023} F. M. Alotaibi and V. G. Vassilakis, ``Toward an SDN-Based Web Application Firewall,'' \textit{Future Internet}, vol. 15, no. 5, p. 170, Apr. 2023.
-
-\bibitem{manaseer2018} S. Manaseer and A. K. Al Hwaitat, ``Centralized Web Application Firewall Security System,'' \textit{Mod. Appl. Sci.}, vol. 12, no. 10, p. 164, Sep. 2018.
-
-\bibitem{philip2023} J. Philip et al., ``Application gateway with web application firewall,'' in \textit{Proc. 1st Int. Conf. Frontier Digital Technology}, 2023, p. 030001.
-
-\bibitem{appsentinels2025} ``Top 25 WAFs 2025,'' AppSentinels, Sep. 2025.
-
-\bibitem{indusface2025} ``17 Best Cloud WAAP and WAF Vendors in 2025,'' Indusface Blog, Oct. 2025.
-
-\bibitem{owasp_modsec} ``OWASP ModSecurity,'' OWASP Foundation, 2012.
-
-\bibitem{mukhtar2020} B. I. Mukhtar and M. A. Azer, ``Evaluating the Modsecurity WAF Against SQL Injection,'' in \textit{Proc. 15th Int. Conf. Computer Eng. Systems}, Dec. 2020, pp. 1-6.
-
-\bibitem{pratama2023} K. D. Pratama and N. Anwar, ``Impact Analysis of WAF on Website Security,'' \textit{Mob. Forensics}, vol. 5, no. 1, pp. 44-58, Mar. 2023.
-
-\bibitem{gzyl2023} H. Gzyl et al., ``Understanding Feature Space of Commercial WAFs,'' \textit{Entropy}, vol. 25, no. 11, p. 1476, Oct. 2023.
-
-\bibitem{omar2023} F. Omar et al., ``Towards a User-Friendly WAF,'' in \textit{Proc. 11th Int. Conf. Intelligent Computing}, Nov. 2023, pp. 483-488.
-
-\bibitem{darmawan2024} I. Darmawan et al., ``Real-time WAF Monitoring using OWASP CRS,'' in \textit{Proc. 9th Int. Conf. Informatics Computing}, Oct. 2024, pp. 1-6.
-
-\bibitem{sepczuk2023} M. Sepczuk, ``Dynamic WAF detection with Cyber Mimic Defense,'' \textit{J. Netw. Comput. Appl.}, vol. 213, p. 103596, Apr. 2023.
-
-\bibitem{crs_anomaly} ``Anomaly Scoring,'' OWASP CRS Documentation, Oct. 2024.
-
-\bibitem{owasp_warm} ``OWASP WARM – WAF Advanced Ruleset Management,'' 2019.
-
-\bibitem{pci_dss_66} ``PCI DSS Application Reviews and WAFs Clarified,'' PCI Security Standards Council, 2016.
-
-\bibitem{modsec_project} ``ModSecurity Project,'' OWASP Foundation, Aug. 2025.
-
-\bibitem{li2023} W. Li and M. Pan, ``Study on Nginx load balancing algorithm,'' in \textit{Proc. 7th Int. Conf. Electronic Information Technology}, Oct. 2023, pp. 862-866.
-
-\bibitem{last92025} ``HAProxy vs NGINX Performance,'' Last9, Apr. 2025.
-
-\bibitem{cve_2024_1019} ``CVE-2024-1019: ModSecurity Path Confusion Vulnerability,'' NVD, 2024.
-
-\bibitem{owasp_crs} ``OWASP Core Rule Set v3.3.0 Release Notes,'' 2023.
-
-\bibitem{crs_howworks} ``How CRS Works,'' OWASP CRS Documentation, 2024.
-
-\bibitem{crs_paranoia} ``Paranoia Levels Configuration,'' OWASP CRS, 2024.
-
-\bibitem{openappsec2024} ``Best WAF Solutions in 2024-2025,'' open-appsec, Nov. 2024.
-
-\bibitem{crs_releases} ``OWASP CRS Release Cycle,'' OWASP Foundation, 2024.
-
-\bibitem{ampel2023} ``Computational Design Science for Cybersecurity,'' B. M. Ampel, Jun. 2023.
-
-\bibitem{timreview2015} ``Design Science Approach to Critical Infrastructure,'' \textit{Technology Innovation Management Review}, May 2015.
-
-\end{thebibliography}
+\begin{IEEEbiographynophoto}{Samuel Tweneboah-Koduah, Ph.D.}
+is with the Dept. of Computer and Information Science at Campbellsville
+University, USA.
+\textit{[Co-author: please supply a biography paragraph before final
+submission.]}
+\end{IEEEbiographynophoto}
 
 \end{document}
