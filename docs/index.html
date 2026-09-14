@@ -98,9 +98,10 @@
         </div>
       </div>
 
-      <div class="mock-window reveal reveal-delay-1">
-        <div class="mock-titlebar"><span></span><span></span><span></span><span class="path">bash — lab/</span></div>
-        <div class="mock-body">
+      <div class="mock-visual reveal reveal-delay-1">
+        <div class="mock-window">
+          <div class="mock-titlebar"><span></span><span></span><span></span><span class="path">bash — lab/</span></div>
+          <div class="mock-body">
 <span class="m"># bring the stack up and replay real traffic</span><br>
 <span class="p">$</span> ./run_full_evaluation.sh<br><br>
 Bringing up juice-shop, waf, baseline...<br>
@@ -112,11 +113,16 @@ Blocked (403/406): <span class="c">44/50 (88.0%)</span><br>
 Legit traffic false positives: <span class="c">0.00%</span><br>
 Live CRS rules loaded: <span class="c">933</span><br>
 <span class="p">$</span> <span class="caret"></span>
+          </div>
+        </div>
+        <div class="float-card">
+          <div class="fc-icon"><svg class="icon"><use href="#i-shield"/></svg></div>
+          <div><div class="fc-num">88% blocked</div><div class="fc-lbl">real attack corpus, live lab run</div></div>
         </div>
       </div>
     </div>
 
-    <div class="stats reveal" style="margin-top:56px;">
+    <div class="stats reveal" style="margin-top:84px;">
       <div class="stat"><svg class="icon icon-sm"><use href="#i-target"/></svg><div class="num" data-target="98.4" data-decimals="1" data-suffix="%">0%</div><div class="lbl">Aggregate attack detection rate</div></div>
       <div class="stat"><svg class="icon icon-sm"><use href="#i-check"/></svg><div class="num" data-target="4.3" data-decimals="1" data-suffix="%">0%</div><div class="lbl">False positive rate (tuned)</div></div>
       <div class="stat"><svg class="icon icon-sm"><use href="#i-clock"/></svg><div class="num" data-target="11.8" data-decimals="1" data-suffix=" ms">0 ms</div><div class="lbl">Average latency overhead</div></div>
@@ -134,7 +140,12 @@ Live CRS rules loaded: <span class="c">933</span><br>
   </div>
 </section>
 
+<svg class="wave-divider" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0,32 C240,64 480,0 720,16 C960,32 1200,64 1440,32 L1440,64 L0,64 Z"></path>
+</svg>
+
 <section id="abstract" class="alt">
+  <div class="section-blobs blue" aria-hidden="true"><span></span><span></span></div>
   <div class="wrap">
     <span class="eyebrow reveal">Abstract</span>
     <h2 class="reveal">Enterprise-grade Layer-7 security, zero licensing cost</h2>
@@ -193,19 +204,19 @@ Live CRS rules loaded: <span class="c">933</span><br>
 
     <div class="grid-3" style="margin-top:40px;">
       <div class="card hoverable reveal">
-        <div class="icon-chip"><svg class="icon"><use href="#i-layers"/></svg></div>
+        <div class="icon-chip c-violet"><svg class="icon"><use href="#i-layers"/></svg></div>
         <h3>WAF Detection Taxonomy</h3>
         <p>Signature-based, positive-security, anomaly detection, and hybrid models — CRS
         combines all four into a single anomaly score.</p>
       </div>
       <div class="card hoverable reveal reveal-delay-1">
-        <div class="icon-chip"><svg class="icon"><use href="#i-flask"/></svg></div>
+        <div class="icon-chip c-orange"><svg class="icon"><use href="#i-flask"/></svg></div>
         <h3>Design Science Research</h3>
         <p>Three refinement cycles of build → demonstrate → evaluate, converging on
         TPR ≥ 95%, FPR ≤ 5%, latency ≤ 15 ms.</p>
       </div>
       <div class="card hoverable reveal reveal-delay-2">
-        <div class="icon-chip"><svg class="icon"><use href="#i-chart"/></svg></div>
+        <div class="icon-chip c-aqua"><svg class="icon"><use href="#i-chart"/></svg></div>
         <h3>OWASP CRS Anomaly Scoring</h3>
         <p>Multiple weak rule matches accumulate into one score; blocking triggers only
         once the cumulative threshold is crossed.</p>
@@ -215,6 +226,7 @@ Live CRS rules loaded: <span class="c">933</span><br>
 </section>
 
 <section id="results" class="alt">
+  <div class="section-blobs violet" aria-hidden="true"><span></span><span></span></div>
   <div class="wrap">
     <span class="eyebrow reveal">Results, Visualized</span>
     <h2 class="reveal">Six views into the data</h2>
@@ -326,6 +338,7 @@ Live CRS rules loaded: <span class="c">933</span><br>
 
 <!-- ============ PAPER SHOWCASE ============ -->
 <section id="paper" class="alt">
+  <div class="section-blobs orange" aria-hidden="true"><span></span></div>
   <div class="wrap">
     <span class="eyebrow reveal">Read The Research</span>
     <h2 class="reveal">Paper Showcase</h2>
@@ -398,6 +411,7 @@ cd Evaluating-Open-Source-Web-Application-Firewalls-Using-ModSecurity-and-Nginx/
 </section>
 
 <section id="author" class="alt">
+  <div class="section-blobs blue" aria-hidden="true"><span></span><span></span></div>
   <div class="wrap">
     <span class="eyebrow reveal">About the Author</span>
     <h2 class="reveal">Md Anisur Rahman Chowdhury</h2>
